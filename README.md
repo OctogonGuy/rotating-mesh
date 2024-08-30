@@ -11,3 +11,4 @@ Execute the following commands to compile and run:
 make
 ./bin/rotating_mesh
 ```
+Edit `res/mesh.txt` to change the mesh that is rendered.

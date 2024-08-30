@@ -34,7 +34,7 @@ struct Mat4
 	float m[4][4];
 };
 
-struct Mesh cube;
+struct Mesh polyhedron;
 struct Mat4 matProj, matRotX, matRotY, matRotZ;
 
 struct Vec3 matrixVectorMultiply(struct Vec3* u, struct Mat4* m);
@@ -51,21 +51,43 @@ void close_();
 
 int main()
 {
-	// Mesh
-	cube = (struct Mesh) {
-		0.0f, 0.0f, 0.0f, 	0.0f, 1.0f, 0.0f, 	1.0f, 1.0f, 0.0f,
-		0.0f, 0.0f, 0.0f, 	1.0f, 1.0f, 0.0f, 	1.0f, 0.0f, 0.0f,
-		1.0f, 0.0f, 0.0f, 	1.0f, 1.0f, 0.0f, 	1.0f, 1.0f, 1.0f,
-		1.0f, 0.0f, 0.0f, 	1.0f, 1.0f, 1.0f, 	1.0f, 0.0f, 1.0f,
-		1.0f, 0.0f, 1.0f, 	1.0f, 1.0f, 1.0f, 	0.0f, 1.0f, 1.0f,
-		1.0f, 0.0f, 1.0f, 	0.0f, 1.0f, 1.0f, 	0.0f, 0.0f, 1.0f,
-		0.0f, 0.0f, 1.0f, 	0.0f, 1.0f, 1.0f, 	0.0f, 1.0f, 0.0f,
-		0.0f, 0.0f, 1.0f, 	0.0f, 1.0f, 0.0f, 	0.0f, 0.0f, 0.0f,
-		0.0f, 1.0f, 0.0f, 	0.0f, 1.0f, 1.0f, 	1.0f, 1.0f, 1.0f,
-		0.0f, 1.0f, 0.0f, 	1.0f, 1.0f, 1.0f, 	1.0f, 1.0f, 0.0f,
-		0.0f, 0.0f, 1.0f, 	0.0f, 0.0f, 0.0f, 	1.0f, 0.0f, 0.0f,
-		0.0f, 0.0f, 1.0f, 	1.0f, 0.0f, 0.0f, 	1.0f, 0.0f, 1.0f,
-	};
+	// Read mesh from file
+	FILE *fptr;	
+	fptr = fopen("res/mesh.txt", "r");
+	char line[0xFF];
+	char* token;
+	if (fptr == NULL)
+	{
+		printf("Not able to open mesh.txt\n");
+	}
+	unsigned int i = 0;
+	while (fgets(line, 0xFF, fptr))
+	{
+		unsigned int j = 0;
+		token = strtok(line, " ");
+		while (token != NULL)
+		{
+			switch (j % 3)
+			{
+				case 0:
+					polyhedron.tris[i].p[j/3].x = atof(token);
+					break;
+				case 1:
+					polyhedron.tris[i].p[j/3].y = atof(token);
+					break;
+				case 2:
+					polyhedron.tris[i].p[j/3].z = atof(token);
+					break;
+			}
+			j++;
+			token = strtok(NULL, " ");
+		}
+		if (j != 9)
+		{
+			printf("Line %d of mesh.txt has %d tokens instead of 9\n", i, j);
+		}
+		i++;
+	}
 
 	// Projection matrix
 	float fov = 90.0f;
@@ -100,7 +122,7 @@ int main()
 		// Update rotation matrices
 		updateRotationMatrices();
 
-		// Render cube
+		// Render polyhedron
 		render_();
 	}
 
@@ -143,12 +165,12 @@ void render_()
 	SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0xFF);
 	SDL_RenderClear(renderer);
 	
-	// Draw the cube as triangles projected to the screen using the projection matrix
+	// Draw the polyhedron as triangles projected to the screen using the projection matrix
 	SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
 	for (unsigned int i = 0; i < 12; i++)
 	{
 		struct Triangle tri, triProj, triTrans, triRot;
-		tri = cube.tris[i];
+		tri = polyhedron.tris[i];
 
 		// Rotate
 		triRot.p[0] = matrixVectorMultiply(&tri.p[0], &matRotZ);
