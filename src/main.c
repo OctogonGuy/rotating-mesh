@@ -27,6 +27,7 @@ struct Triangle
 struct Mesh
 {
 	struct Triangle tris[0xFFFF];
+	size_t size;
 };
 
 struct Mat4
@@ -34,7 +35,7 @@ struct Mat4
 	float m[4][4];
 };
 
-struct Mesh polyhedron;
+struct Mesh mesh;
 struct Mat4 matProj, matRotX, matRotY, matRotZ;
 
 struct Vec3 matrixVectorMultiply(struct Vec3* u, struct Mat4* m);
@@ -49,44 +50,68 @@ void close_();
 
 
 
-int main()
+int main(int argc, char **argv)
 {
 	// Read mesh from file
+	if (argc < 2)
+	{
+		printf("Please provide the path to an .obj file as an argument\n");
+	}
 	FILE *fptr;	
-	fptr = fopen("res/mesh.txt", "r");
+	fptr = fopen(argv[1], "r");
 	char line[0xFF];
-	char* token;
+	char* cur_token;
+	char* tokens[0xFF];
+	struct Vec3 vertices[0xFFFF];
 	if (fptr == NULL)
 	{
-		printf("Not able to open mesh.txt\n");
+		printf("Not able to open %s\n", argv[1]);
 	}
-	unsigned int i = 0;
+	unsigned int v_index = 0;
+	unsigned int f_index = 0;
 	while (fgets(line, 0xFF, fptr))
 	{
-		unsigned int j = 0;
-		token = strtok(line, " ");
-		while (token != NULL)
+		cur_token = strtok(line, " ");
+		tokens[0] = cur_token;
+		unsigned int token_index = 1;
+		while (cur_token != NULL)
 		{
-			switch (j % 3)
+			cur_token = strtok(NULL, " ");
+			tokens[token_index] = cur_token;
+			token_index++;
+		}
+		if (tokens[0] == NULL)
+		{
+			continue;
+		}
+		else if (strcmp(tokens[0], "v") == 0)
+		{
+			vertices[v_index].x = atof(tokens[1]);
+			vertices[v_index].y = atof(tokens[2]);
+			vertices[v_index].z = atof(tokens[3]);
+			v_index++;
+		}
+		else if (strcmp(tokens[0], "f") == 0)
+		{
+			unsigned int v_index1, v_index2, v_index3;
+			if (strstr(tokens[1], "/") != NULL)
 			{
-				case 0:
-					polyhedron.tris[i].p[j/3].x = atof(token);
-					break;
-				case 1:
-					polyhedron.tris[i].p[j/3].y = atof(token);
-					break;
-				case 2:
-					polyhedron.tris[i].p[j/3].z = atof(token);
-					break;
+				v_index1 = atoi(strtok(tokens[1], "/")) - 1;
+				v_index2 = atoi(strtok(tokens[2], "/")) - 1;
+				v_index3 = atoi(strtok(tokens[3], "/")) - 1;
 			}
-			j++;
-			token = strtok(NULL, " ");
+			else
+			{
+				v_index1 = atoi(tokens[1]) - 1;
+				v_index2 = atoi(tokens[2]) - 1;
+				v_index3 = atoi(tokens[3]) - 1;
+			}
+			mesh.tris[f_index].p[0] = vertices[v_index1];
+			mesh.tris[f_index].p[1] = vertices[v_index2];
+			mesh.tris[f_index].p[2] = vertices[v_index3];
+			f_index++;
 		}
-		if (j != 9)
-		{
-			printf("Line %d of mesh.txt has %d tokens instead of 9\n", i, j);
-		}
-		i++;
+		mesh.size = f_index;
 	}
 
 	// Projection matrix
@@ -122,7 +147,7 @@ int main()
 		// Update rotation matrices
 		updateRotationMatrices();
 
-		// Render polyhedron
+		// Render mesh
 		render_();
 	}
 
@@ -165,12 +190,12 @@ void render_()
 	SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0xFF);
 	SDL_RenderClear(renderer);
 	
-	// Draw the polyhedron as triangles projected to the screen using the projection matrix
+	// Draw the mesh as triangles projected to the screen using the projection matrix
 	SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
-	for (unsigned int i = 0; i < 12; i++)
+	for (unsigned int i = 0; i < mesh.size; i++)
 	{
 		struct Triangle tri, triProj, triTrans, triRot;
-		tri = polyhedron.tris[i];
+		tri = mesh.tris[i];
 
 		// Rotate
 		triRot.p[0] = matrixVectorMultiply(&tri.p[0], &matRotZ);
