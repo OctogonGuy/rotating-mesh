@@ -26,7 +26,7 @@ struct Triangle
 
 struct Mesh
 {
-	struct Triangle tris[0xFFFF];
+	struct Triangle tris[0xFFFFF];
 	size_t size;
 };
 
@@ -62,7 +62,7 @@ int main(int argc, char **argv)
 	char line[0xFF];
 	char* cur_token;
 	char* tokens[0xFF];
-	struct Vec3 vertices[0xFFFF];
+	struct Vec3* vertices = malloc(0xFFFF*sizeof(struct Vec3));
 	if (fptr == NULL)
 	{
 		printf("Not able to open %s\n", argv[1]);
@@ -90,7 +90,8 @@ int main(int argc, char **argv)
 			vertices[v_index].x = atof(tokens[1]);
 			vertices[v_index].y = atof(tokens[2]);
 			vertices[v_index].z = atof(tokens[3]);
-			largest_v_abs = fmax(fabs(vertices[v_index].x), fabs(vertices[v_index].y));
+			largest_v_abs = fmax(largest_v_abs, fabs(vertices[v_index].x));
+			largest_v_abs = fmax(largest_v_abs, fabs(vertices[v_index].y));
 			largest_v_abs = fmax(largest_v_abs, fabs(vertices[v_index].z));
 			v_index++;
 		}
