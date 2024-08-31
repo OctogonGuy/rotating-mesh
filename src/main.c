@@ -2,6 +2,9 @@
 #define SCREEN_WIDTH 500	// Screen width
 #define DISTANCE 3.0		// Z-axis distance from near
 #define RPS 0.2				// Rotations per second
+#define X_ANGLE 180.0		// Starting angle for X-axis
+#define Y_ANGLE 0.0			// Starting angle for Y-axis
+#define Z_ANGLE 0.0			// Starting angle for Z-axis
 #define X_RPS_MULT 1		// X-axis rotations per overall rotation
 #define Y_RPS_MULT 0		// Y-axis rotations per overall rotation
 #define Z_RPS_MULT 2		// Z-axis rotations per overall rotation
@@ -284,28 +287,31 @@ void updateRotationMatrices()
 	float two_pi = 2.0f * (float)M_PI;
 	float angle = RPS * 0.001f * time * two_pi;
 	float theta = angle - two_pi * floor(angle/two_pi);
+	float x_angle_rad = X_ANGLE / 180.0 * (float)M_PI;
+	float y_angle_rad = Y_ANGLE / 180.0 * (float)M_PI;
+	float z_angle_rad = Z_ANGLE / 180.0 * (float)M_PI;
 
 	// Rotation X
 	matRotX.m[0][0] = 1.0f;
-	matRotX.m[1][1] = cosf(theta * X_RPS_MULT);
-	matRotX.m[1][2] = -sinf(theta * X_RPS_MULT);
-	matRotX.m[2][1] = sinf(theta * X_RPS_MULT);
-	matRotX.m[2][2] = cosf(theta * X_RPS_MULT);
+	matRotX.m[1][1] = cosf(theta * X_RPS_MULT + x_angle_rad);
+	matRotX.m[1][2] = -sinf(theta * X_RPS_MULT + x_angle_rad);
+	matRotX.m[2][1] = sinf(theta * X_RPS_MULT + x_angle_rad);
+	matRotX.m[2][2] = cosf(theta * X_RPS_MULT + x_angle_rad);
 	matRotX.m[3][3] = 1.0f;
 
 	// Rotation Y
-	matRotY.m[0][0] = cosf(theta * Y_RPS_MULT);
-	matRotY.m[0][2] = sinf(theta * Y_RPS_MULT);
+	matRotY.m[0][0] = cosf(theta * Y_RPS_MULT + y_angle_rad);
+	matRotY.m[0][2] = sinf(theta * Y_RPS_MULT + y_angle_rad);
 	matRotY.m[1][1] = 1.0f;
-	matRotY.m[2][0] = -sinf(theta * Y_RPS_MULT);
-	matRotY.m[2][2] = cosf(theta * Y_RPS_MULT);
+	matRotY.m[2][0] = -sinf(theta * Y_RPS_MULT + y_angle_rad);
+	matRotY.m[2][2] = cosf(theta * Y_RPS_MULT + y_angle_rad);
 	matRotY.m[3][3] = 1.0f;
 
 	// Rotation Z
-	matRotZ.m[0][0] = cosf(theta * Z_RPS_MULT);
-	matRotZ.m[0][1] = -sinf(theta * Z_RPS_MULT);
-	matRotZ.m[1][0] = sin(theta * Z_RPS_MULT);
-	matRotZ.m[1][1] = cos(theta * Z_RPS_MULT);
+	matRotZ.m[0][0] = cosf(theta * Z_RPS_MULT + z_angle_rad);
+	matRotZ.m[0][1] = -sinf(theta * Z_RPS_MULT + z_angle_rad);
+	matRotZ.m[1][0] = sin(theta * Z_RPS_MULT + z_angle_rad);
+	matRotZ.m[1][1] = cos(theta * Z_RPS_MULT + z_angle_rad);
 	matRotZ.m[2][2] = 1.0f;
 	matRotZ.m[3][3] = 1.0f;
 }
