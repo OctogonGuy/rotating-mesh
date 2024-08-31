@@ -69,6 +69,7 @@ int main(int argc, char **argv)
 	}
 	unsigned int v_index = 0;
 	unsigned int f_index = 0;
+	float largest_v_abs = 0;
 	while (fgets(line, 0xFF, fptr))
 	{
 		cur_token = strtok(line, " ");
@@ -89,6 +90,8 @@ int main(int argc, char **argv)
 			vertices[v_index].x = atof(tokens[1]);
 			vertices[v_index].y = atof(tokens[2]);
 			vertices[v_index].z = atof(tokens[3]);
+			largest_v_abs = fmax(fabs(vertices[v_index].x), fabs(vertices[v_index].y));
+			largest_v_abs = fmax(largest_v_abs, fabs(vertices[v_index].z));
 			v_index++;
 		}
 		else if (strcmp(tokens[0], "f") == 0)
@@ -111,7 +114,20 @@ int main(int argc, char **argv)
 			mesh.tris[f_index].p[2] = vertices[v_index3];
 			f_index++;
 		}
-		mesh.size = f_index;
+	}
+
+	// Record number of faces
+	mesh.size = f_index;
+
+	// Normalize vectors
+	for (unsigned int i = 0; i < mesh.size; i++)
+	{
+		for (unsigned int j = 0; j < 3; j++)
+		{
+			mesh.tris[i].p[j].x /= largest_v_abs;
+			mesh.tris[i].p[j].y /= largest_v_abs;
+			mesh.tris[i].p[j].z /= largest_v_abs;
+		}
 	}
 
 	// Projection matrix
