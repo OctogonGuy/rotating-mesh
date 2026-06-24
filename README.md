@@ -3,7 +3,12 @@ This program displays a rotating 3D projection of a mesh using SDL and basic lin
 
 ## Prerequisites
 The following libraries are required to compile:
+- gcc
+    - Debian-based distributions: `gcc`
+    - Red Hat-based distributions: `gcc`
 - SDL2
+    - Debian-based distributions: `libsdl2-dev`
+    - Red Hat-based distributions: `SDL2-devel`
 
 ## Usage
 Execute the following commands to compile and run:
