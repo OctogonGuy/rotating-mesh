@@ -1,13 +1,13 @@
-#define SCREEN_HEIGHT 500	// Screen height
-#define SCREEN_WIDTH 500	// Screen width
-#define DISTANCE 3.0		// Z-axis distance from near
+#define SCREEN_HEIGHT 1000	// Screen height
+#define SCREEN_WIDTH 1000	// Screen width
+#define DISTANCE 1.5		// Z-axis distance from near
 #define RPS 0.2				// Rotations per second
 #define X_ANGLE 180.0		// Starting angle for X-axis
 #define Y_ANGLE 0.0			// Starting angle for Y-axis
-#define Z_ANGLE 0.0			// Starting angle for Z-axis
-#define X_RPS_MULT 1		// X-axis rotations per overall rotation
-#define Y_RPS_MULT 0		// Y-axis rotations per overall rotation
-#define Z_RPS_MULT 2		// Z-axis rotations per overall rotation
+#define Z_ANGLE 45.0		// Starting angle for Z-axis
+#define X_RPS_MULT 0		// X-axis rotations per overall rotation
+#define Y_RPS_MULT 1		// Y-axis rotations per overall rotation
+#define Z_RPS_MULT 0		// Z-axis rotations per overall rotation
 
 #define _USE_MATH_DEFINES
 #include <stdio.h>
